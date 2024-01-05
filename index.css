@@ -11,3 +11,22 @@ body, html {
 html {
     box-sizing: border-box;
 }
+
+h1,
+h2,
+p,
+ul,
+li {
+    margin: 0;
+    padding: 0;
+}
+
+.div-container {
+    width: 600px;
+    margin: 50px auto;
+}
+
+/* Temporary styles */
+button:active {
+    transform: scale(0.9);
+}
