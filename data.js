@@ -1,24 +1,34 @@
 export const menuArray = [
     {
-        name: "Pizza",
-        ingredients: ["pepperoni", "mushroom", "mozarella"],
+        name: "Vanilla Latte",
+        ingredients: ["Milk", "Espresso", "Syrup"],
         id: 0,
-        price: 14,
-        emoji: "🍕"
+        price: 4,
+        imageURL: "",
+        category: "coffee"
     },
     {
-        name: "Hamburger",
-        ingredients: ["beef", "cheese", "lettuce", "onions"],
-        price: 12,
-        emoji: "🍔",
-        id: 1
+        name: "Flat White",
+        ingredients: ["Milk", "Double Espresso"],
+        price: 3,
+        imageURL: "",
+        id: 1,
+        category: "coffee"
     },
     {
-        name: "Beer",
-        ingredients: ["grain, hops, yeast, water"],
-        price: 12,
-        emoji: "🍺",
-        id: 2
+        name: "Black Americano",
+        ingredients: ["Espresso", "H20"],
+        price: 3,
+        imageURL: "",
+        id: 2,
+        category: "coffee"
     },
+    {
+        name: "Ham & Cheese Toastie",
+        ingredients: ["Bread", "Ham", "Cheese", "Mustard"],
+        price: 8,
+        id: 3,
+        category: "breakfast"   
+    }
     
 ]

@@ -30,3 +30,7 @@ li {
 button:active {
     transform: scale(0.9);
 }
+
+.section-menu-filter {
+    display: flex;
+}

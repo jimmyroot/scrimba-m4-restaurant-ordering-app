@@ -2,6 +2,8 @@ import { menuArray } from './data.js'
 
 const divMenu = document.getElementById('section-menu')
 
+const order = []
+
 document.getElementById('btn-view-order').addEventListener('click', (e) => {
     handleViewOrder()
 })
@@ -15,18 +17,17 @@ divMenu.addEventListener('click', (e) => {
     if (id) handleAddItemToOrder(id)
 })
 
-const order = []
-
-const renderMenu = () => {
-    divMenu.innerHTML = getMenuHTML(menuArray)
+const renderMenu = (category = 'coffee') => {
+    divMenu.innerHTML = getMenuHTML(menuArray, category)
 }
 
 const renderOrder = (order) => {
+    document.getElementById('modal-view-order-inner').innerHTML = getOrderHTML(order)
 
 }
 
-const getMenuHTML = (menu) => {
-    return menu.map(item => {
+const getMenuHTML = (menu, category) => {
+    return menu.filter(item => item.category === category).map(item => {
         return `
             <p>${item.name}</p>
             <button data-id="${item.id}">Add</button>
@@ -34,8 +35,12 @@ const getMenuHTML = (menu) => {
     }).join('')
 }
 
-const getOrderHTML = () => {
-
+const getOrderHTML = (order) => {
+    return order.map(item => {
+        return `
+            <p>${item.name}</p>
+        `
+    }).join('')
 }
 
 // Helper functions
@@ -50,11 +55,11 @@ const showModal = (modal, show) => {
 const handleAddItemToOrder = (id) => {
     const item = menuArray.find(item => item.id === +id)
     order.push(item)
-    console.log(order)
+    renderOrder(order)
 }
 
 const handleViewOrder = () => {
     showModal('modal-view-order', true)
 }
 
-renderMenu()
+renderMenu('coffee')
