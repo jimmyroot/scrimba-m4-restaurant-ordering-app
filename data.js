@@ -1,34 +1,89 @@
 export const menuArray = [
     {
-        name: "Vanilla Latte",
-        ingredients: ["Milk", "Espresso", "Syrup"],
+        name: "Café Latte",
+        ingredients: ["Milk", "Espresso"],
         id: 0,
-        price: 4,
-        imageURL: "",
+        price: 4.25,
+        imageURL: "/assets/cafe-latte.png",
         category: "coffee"
     },
     {
         name: "Flat White",
         ingredients: ["Milk", "Double Espresso"],
-        price: 3,
-        imageURL: "",
+        price: 3.75,
+        imageURL: "/assets/flat-white.png",
         id: 1,
         category: "coffee"
     },
     {
         name: "Black Americano",
         ingredients: ["Espresso", "H20"],
-        price: 3,
-        imageURL: "",
+        price: 3.00,
+        imageURL: "/assets/black-americano.png",
         id: 2,
         category: "coffee"
     },
     {
-        name: "Ham & Cheese Toastie",
-        ingredients: ["Bread", "Ham", "Cheese", "Mustard"],
-        price: 8,
+        name: "Ham & Cheese Croissant",
+        ingredients: ["Ham", "Cheese", "Wheat", "Butter"],
+        price: 5,
         id: 3,
         category: "breakfast"   
+    },
+    {
+        name: "Bircher Muesli Bowl",
+        ingredients: ["Oats", "Yoghurt", "Honey", "Berries", "Pistachios"],
+        price: 4,
+        id: 4,
+        category: "breakfast"   
+    },
+    {
+        name: "Egg, Bacon, Avocado Roll",
+        ingredients: ["Wheat", "Eggs", "Bacon", "Avocado"],
+        price: 7,
+        id: 5,
+        category: "breakfast"   
+    },
+    {
+        name: "Blueberry Muffin",
+        ingredients: ["Wheat", "Sugar", "Blueberries", "Butter"],
+        price: 2,
+        id: 6,
+        category: "cakes"   
+    },
+    {
+        name: "Almond Croissant",
+        ingredients: ["Wheat", "Butter", "Almond Paste", "Icing Sugar"],
+        price: 3,
+        id: 7,
+        category: "cakes"   
+    },
+    {
+        name: "Pastel De Nata",
+        ingredients: ["Wheat", "Custard", "Sugar", "Eggs"],
+        price: 3,
+        id: 8,
+        category: "cakes"   
+    },
+    {
+        name: "Ice Tea",
+        ingredients: ["Wheat", "Butter", "Almond Paste", "Icing Sugar"],
+        price: 5,
+        id: 9,
+        category: "other"   
+    },
+    {
+        name: "English Breakfast Tea",
+        ingredients: ["Wheat", "Butter", "Almond Paste", "Icing Sugar"],
+        price: 3,
+        id: 10,
+        category: "other"   
+    },
+    {
+        name: "Sparkling Water",
+        ingredients: ["Wheat", "Butter", "Almond Paste", "Icing Sugar"],
+        price: 2,
+        id: 11,
+        category: "other"   
     }
-    
 ]

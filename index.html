@@ -3,34 +3,157 @@
         <title>Bean & Gone</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
         <link rel="stylesheet" href="index.css">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Crete+Round&family=Merriweather+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     </head>
     <body>
         <div class="div-container">
+
+            <!-- Main page -->
             <header>
+                <img class="img-header" src="/assets/header-image.png" alt="A picture of some delicious coffee beans">
                 <h1>Bean & Gone</h1>
-                <p>Coffee. Code. Hang.</p>
+                <p class="p-tagline">Coffee. Code. Hang.</p>
+                <p class="p-header-detail">
+                    <a href="#"><i class='bx bxs-star' ></i> 4.8 (1,847)</a> • 
+                    No min. order • 
+                    <a href="#">Allergen info</a>
+                </p>
             </header>
             <main>
-                <section class="section-menu-filter" id="section-menu-filter">
-                    <button class="btn-category">Coffee</button>
-                    <button class="btn-category">Breakfast</button>
-                    <button class="btn-category">Lunch</button>
-                    <button class="btn-category">Treats</button>
-                    <button class="btn-category">Other</button>
+                <section class="section-order-parameters">
+                    <div class="div-order-type" id="div-order-type">
+                        <button class="btn-order-type" data-id="togo"><i class="bx bx-coffee-togo bx-md"></i>Order to go</button>
+                        <button class="btn-order-type btn-selected" data-id="table"><i class="bx bx-qr-scan bx-md" ></i>Order to table</button>
+                    </div>
+                    <ul class="ul-menu-filter" id="ul-menu-filter">
+                        <!-- Filter buttons will be rendered here -->
+                    </ul>  
                 </section>
-                <section class="section-menu" id="section-menu">
-                    
+                <section>
+                    <ul class="ul-menu" id="ul-menu">
+                        
+                    </ul>
                 </section>
                 <section class="section-order" id="section-order">
-                    <button class="btn btn-view-order" id="btn-view-order">View order</button>
+                    <button class="btn btn-view-order" id="btn-view-basket">
+                        <i class="bx bx-basket bx-lg"></i>
+                        <span class="span-item-count" id="span-item-count">0</span>
+                        <span>View basket</span>
+                        <span class="span-basket-total" id="span-basket-total">£0.00</span>
+                    </button>
                 </section>
             </main>
-            <dialog class="modal" id="modal-view-order">
-                <div id="modal-view-order-inner">
+            <footer>
+                <ul class="ul-footer-nav">
+                    <li class="li-footer-nav">
+                        <button>
+                            <img class="img-account" src="/assets/jimmy.png" User avatar">
+                            <span>Account</span>
+                        </button>
+                    </li>
+                    <li class="li-footer-nav">
+                        <button id="btn-my-orders">
+                            <i class='bx bx-receipt bx-lg'></i>
+                            <span>My Orders</span>
+                        </button>
+                    </li>
+                    <li class="li-footer-nav">
+                        <button>
+                            <i class='bx bx-gift bx-lg'></i>
+                            <span>Deals</span>
+                        </button>
+                    </li>
+                    <li class="li-footer-nav">
+                        <button>
+                            <i class='bx bx-cog bx-lg'></i>
+                            <span>Settings</span>
+                        </button>
+                    </li>
+                </ul>
+            </footer>
+
+            <!-- Modal: View Basket -->
+            <dialog class="modal" id="modal-view-basket">
+                <div class="modal-inner">
+                    <h3 class="modal-title">Your basket</h3>
+                    
+                    <!-- Using a div as a decorative divider, can't use border of other elements
+                    because I want it to be less than full width -->
+                    <!-- <div class="div-modal-divider"></div> -->
+                    <ul class="ul-menu" id="ul-view-basket-items">
+                    </ul>
+                    <div class="div-modal-footer">
+                        <div class="div-modal-total" id="div-view-basket-total">
+                            <p>Total:</p>
+                            <p>£0.00</p>
+                        </div>
+                        <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
+                    </div>
+                    <button class="btn-modal-close" id="btn-close-view-basket" data-type="close">
+                        <i class='bx bx-x bx-md'></i>
+                    </button>
                 </div>
-                <button id="btn-close-view-order">Close</button>
+            </dialog>
+
+            <!-- Modal: Checkout -->
+            <dialog class="modal" id="modal-checkout">
+                <h3 class="modal-title">Checkout</h3>
+                <button class="btn-modal-back" data-type="back">
+                    <i class='bx bx-chevron-left bx-md' ></i>
+                </button>
+                <button class="btn-modal-close" data-type="close">
+                    <i class='bx bx-x bx-md'></i>
+                </button>
+                <div id="modal-checkout-inner">
+                    <p>Total to pay <span id="span-checkout-total">$0</span></p>
+                    <form>
+                        <div>
+                            <label for="card-name">Name</label>
+                            <input id="card-name" placeholder="Name">
+                        </div>
+                        <div>
+                            <label for="card-number">Card Number</label>
+                            <input id="card-number" placeholder="Card Number">
+                        </div>
+                        <div>
+                            <label for="card-ccv">CCV</label>
+                            <input id="card-ccv" placeholder="CCV">
+                        </div>
+                    </form>
+                </div>
+        
+                <button id="btn-pay" data-type="pay">Pay</button>
+            </dialog>
+
+            <!-- Modal: Order Complete -->
+            <dialog class="modal" id="modal-order-complete">
+                <div id="div-modal-order-complete-inner">
+                    <div id="div-modal-order-complete-details">
+
+                    </div>
+                    <button data-type="back">Back to menu</button>
+                </div>
+            </dialog>
+
+            <!-- Modal: My Orders -->
+            <dialog class="modal" id="modal-my-orders">
+                <div id="div-modal-my-orders-inner">
+
+                </div>
+                <button id="btn-close-my-orders">Close</button>
+            </dialog>
+
+            <!-- Modal: Discounts -->
+            <dialog class="modal" id="modal-discounts">
+                <div id="div-modal-discounts-inner">
+
+                </div>
+                <button id="btn-back">Close</button>
             </dialog>
         </div>
-	<script src="index.js" type="module"></script>
+	    <script src="index.js" type="module"></script>
     </body>
 </html>
