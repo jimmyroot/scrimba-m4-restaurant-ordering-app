@@ -1,3 +1,9 @@
+// Todo 1: Fix ul scroll in modal when too many items added to list
+// Todo 2: Align the minus logo in the middle of remove button, make sure it's a circle
+// Todo 3: Fix the color of the ingredients lists on main page
+// Todo 4: Create a selection function for the bottom row of icons (use vivid color for selection)
+// Todo 5: Create star rating system
+
 import { menuArray } from './data.js'
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
 
@@ -8,6 +14,7 @@ const modalViewBasket = document.getElementById('modal-view-basket')
 const modalCheckout = document.getElementById('modal-checkout')
 const modalOrderComplete = document.getElementById('modal-order-complete')
 const modalMyOrders = document.getElementById('modal-my-orders')
+const modalDiscounts = document.getElementById('modal-discounts')
 const btnCheckout = document.getElementById('btn-checkout')
 
 // Init vars
@@ -23,22 +30,56 @@ document.getElementById('btn-close-view-basket').addEventListener('click', () =>
     showModal(modalViewBasket, false)
 })
 
-document.getElementById('btn-my-orders').addEventListener('click', () => {
+document.getElementById('b-nav-my-orders').addEventListener('click', () => {
     showModal(modalMyOrders, true)
-})
-
-document.getElementById('btn-close-my-orders').addEventListener('click', () => {
-    showModal(modalMyOrders, false)
 })
 
 document.getElementById('div-order-type').addEventListener('click', e => {
     const id = e.target.dataset.id
     if (id) handleSelectOrderType(e.target)
+})
 
+document.getElementById('b-nav-discounts').addEventListener('click', () => {
+    showModal(modalDiscounts, true)
 })
 
 btnCheckout.addEventListener('click', () => {
     handleCheckout()
+})
+
+ulMenuFilter.addEventListener('click', e => {
+    const filter = e.target.dataset.filter
+    if (filter) handleFilterSelection(e.target, filter)
+})
+
+ulMenu.addEventListener('click', e => {
+    const id = e.target.dataset.id
+    if (id) handleAddItemToOrder(id)
+})
+
+modalOrderComplete.addEventListener('click', e => {
+    const type = e.target.dataset.type
+    if (type) handleReset()
+})
+
+modalViewBasket.addEventListener('click', e => {
+    console.log(e.target.dataset.type)
+    const type = e.target.dataset.type
+
+    const handleClick = {
+        checkout: () => {
+            handleCheckout()
+        },
+        close: () => {
+            showModal(modalViewBasket, false)
+        },
+        remove: () => {
+            console.log('fired')
+            handleRemoveItemFromOrder(e.target.dataset.instanceId)
+        },
+    }
+
+    if (type) handleClick[type]()
 })
 
 modalCheckout.addEventListener('click', e => {
@@ -60,37 +101,9 @@ modalCheckout.addEventListener('click', e => {
     if (type) handleClick[type]()
 })
 
-ulMenuFilter.addEventListener('click', e => {
-    const filter = e.target.dataset.filter
-    if (filter) handleFilterSelection(e.target, filter)
-})
-
-ulMenu.addEventListener('click', e => {
-    const id = e.target.dataset.id
-    if (id) handleAddItemToOrder(id)
-})
-
-modalOrderComplete.addEventListener('click', e => {
+modalMyOrders.addEventListener('click', e => {
     const type = e.target.dataset.type
-    if (type) handleReset()
-})
-
-modalViewBasket.addEventListener('click', e => {
-    const type = e.target.dataset.type
-
-    const handleClick = {
-        checkout: () => {
-            handleCheckout()
-        },
-        close: () => {
-            showModal(modalViewBasket, false)
-        },
-        remove: () => {
-            handleRemoveItemFromOrder(e.target.dataset.instanceId)
-        },
-    }
-
-    if (type) handleClick[type]()
+    if (type) showModal(modalMyOrders, false)
 })
 
 // Render functions
@@ -112,47 +125,49 @@ const renderMenu = (menu, category = 'coffee') => {
                     <i class='bx bx-plus bx-md'></i>
                 </button>
             </li>
-            ${isLastIter ? '' : '<div class="div-menu-item-divider"></div>'}
+            ${isLastIter ? '' : '<div class="d-divider d-divider-primary"></div>'}
         `
     }).join('')
 }
 
-const renderOrder = (order) => {
-    const html = order.map((item, index, arr) => {
-        const {name, ingredients, price, imageURL, id} = item
+const renderOrder = (basket) => {
+    const html = basket.map((item, index, arr) => {
+        // console.log(item)
+        const {name, ingredients, price, imageURL, instanceId} = item
         const isLastIter = index + 1 === arr.length
         return `
             <li class="li-menu-item">
                 <img class="img-menu-item" src="${imageURL}">
                 <div>
-                    <span class="span-menu-item-name basket-name">${name}</span>
+                    <span class="span-menu-item-name">${name}</span>
                     <span class="span-menu-item-ingredients basket-ingredients">
                         ${ingredients.map(ingredient => ingredient).join(', ')}
                     </span>
                     <span class="span-menu-item-price basket-price">£${price.toFixed(2)}</span>
                 </div>
-                <button class="btn-remove-item" data-id="${id}">
+                <button class="btn-remove-item" data-instance-id="${instanceId}" data-type="remove">
                     <i class='bx bx-minus bx-sm'></i>
                 </button>
             </li>
-            ${isLastIter ? '' : '<div class="div-modal-divider"></div>'}
+            ${isLastIter ? '' : '<div class="d-divider d-divider-accent"></div>'}
         `
     }).join('')
 
     const htmlTotal = `
-            <div class="div-modal-total">
+            <div class="d-modal-space-between">
                 <p>Total:</p>
-                <p>$${getOrderTotal(order)}</p>
+                <p id="p-basket-total">$${getOrderTotal(basket)}</p>
             </div>
             <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
     `
     
     document.getElementById('ul-view-basket-items').innerHTML = html
     // document.getElementById('div-view-basket-total').innerHTML = htmlTotal
-    document.getElementById('span-item-count').textContent = order.length
-    document.getElementById('span-checkout-total').textContent = `£${getOrderTotal(order)}`
-    document.getElementById('span-basket-total').textContent = `£${getOrderTotal(order)}`
-    enableButtons([btnCheckout], order.length > 0)
+    document.getElementById('span-item-count').textContent = basket.length
+    document.getElementById('p-basket-total').textContent = `£${getOrderTotal(basket)}`
+    document.getElementById('p-basket-total-b').textContent = `£${getOrderTotal(basket)}`
+    document.getElementById('span-basket-total').textContent = `£${getOrderTotal(basket)}`
+    enableButtons([btnCheckout], basket.length > 0)
 }
 
 const renderFilterBtns = () => {
@@ -170,55 +185,60 @@ const renderFilterBtns = () => {
 
 const renderOrderComplete = (order) => {
     let html = `
-        <p>Your order is on it's way!</p>
-        <h3>Order details</h3>
+        <p class="p-modal"->Your order is on it's way! Thank you for visiting. We hope to see you again.</p>
+        <h4 class="h4-your-order">Your order</h4>
+        
     `
 
     html += order.map(item => {
         return `
-            <p>${item.name} $${item.price}</p>
+        <div class="d-ordered-item">
+            <p>${item.name}</p><p>£${item.price.toFixed(2)}</p>
+        </div>
         `
     }).join('')
 
     html += `
-        <p>Total: $${getOrderTotal(order)}</p>
-        <p>How was your experience?</p>
-        <p>⭐️ ⭐️ ⭐️ ⭐️ ⭐️</p>
+        <div class="d-divider d-divider-accent"></div>
+        <div class="d-total">
+            <p>Total:</p> 
+            <p>£${getOrderTotal(order)}</p>
+        </div>
     `
     document.getElementById('div-modal-order-complete-details').innerHTML = html
 }
 
 const renderMyOrders = (myOrders) => {
-    document.getElementById('div-modal-my-orders-inner').innerHTML = myOrders.map(order => {
+    document.getElementById('div-modal-my-orders-inner').innerHTML = myOrders.map((order, index, arr) => {
+        const isLastIter = index + 1 === arr.length
         return `
-            <div>
-                <div>
-                    <p>
-                        <span>${order.date}</span>
-                        <span>$${order.total}</span>
-                    </p>
+            <li>
+                <div class="d-modal-space-between">
+                        <p>${order.date}</p>
+                        <p>£${order.total}</p>
                 </div>
                 <p>${order.items.map(item => item).join(', ')}</p>
-            </div>
+            </li>
+            ${isLastIter ? '' : '<div class="d-divider d-divider-accent"></div>'}
         `
     }).join('')
 }
 
 // HTML FUNCTIONS - maybe consolidate these into the render functions...
-const getOrderHTML = (order) => {
-    let html = order.map(item => {
-        return `
-            <p>${item.name}<button data-type="remove" data-instance-id="${item.instanceId}">Remove</button></p>
-        `
-    }).join('')
+// const getOrderHTML = (order) => {
+//     let html = order.map(item => {
+//         return `
+//             <p>${item.name}<button data-type="remove" data-instance-id="${item.instanceId}">Remove</button></p>
+//         `
+//     }).join('')
     
-    const htmlTotal = `
-        <p>Total: $${getOrderTotal(order)}</p>
-    `
+//     const htmlTotal = `
+//         <p>Total: £${getOrderTotal(order)}</p>
+//     `
 
-    html += htmlTotal
-    return html   
-}
+//     html += htmlTotal
+//     return html   
+// }
 
 // EVENT HANDLERS
 

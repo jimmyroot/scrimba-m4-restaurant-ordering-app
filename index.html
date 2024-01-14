@@ -30,7 +30,7 @@
                     </div>
                     <ul class="ul-menu-filter" id="ul-menu-filter">
                         <!-- Filter buttons will be rendered here -->
-                    </ul>  
+                    </ul>
                 </section>
                 <section>
                     <ul class="ul-menu" id="ul-menu">
@@ -55,15 +55,15 @@
                         </button>
                     </li>
                     <li class="li-footer-nav">
-                        <button id="btn-my-orders">
+                        <button id="b-nav-my-orders">
                             <i class='bx bx-receipt bx-lg'></i>
                             <span>My Orders</span>
                         </button>
                     </li>
                     <li class="li-footer-nav">
-                        <button>
+                        <button id="b-nav-discounts">
                             <i class='bx bx-gift bx-lg'></i>
-                            <span>Deals</span>
+                            <span>Discounts</span>
                         </button>
                     </li>
                     <li class="li-footer-nav">
@@ -75,84 +75,140 @@
                 </ul>
             </footer>
 
-            <!-- Modal: View Basket -->
-            <dialog class="modal" id="modal-view-basket">
-                <div class="modal-inner">
-                    <h3 class="modal-title">Your basket</h3>
+                <!-- Modal: View Basket -->
+                <dialog class="modal" id="modal-view-basket">
+                    <div class="modal-inner">
+                        <h3 class="modal-title">Your basket</h3>
+                        <div class="d-divider d-divider-accent"></div>
+                        
+                        <!-- Using a div as a decorative divider, can't use border of other elements
+                        because I want it to be less than full width -->
+                        <!-- <div class="d-modal-divider"></div> -->
+                        <ul class="ul-menu" id="ul-view-basket-items">
+                        </ul>
+                        <div class="div-modal-footer">
+                            <div class="d-modal-space-between" id="div-view-basket-total">
+                                <p>Total:</p>
+                                <p id="p-basket-total">£0.00</p>
+                            </div>
+                            <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
+                        </div>
+                        <button class="btn-modal-close" id="btn-close-view-basket" data-type="close">
+                            <i class='bx bx-x bx-md'></i>
+                        </button>
+                    </div>
+                </dialog>
+
+                <!-- Modal: Checkout -->
+                <dialog class="modal" id="modal-checkout">
+                    <div class="modal-inner">
+                        <h3 class="modal-title">Checkout</h3>
+                        <div class="d-divider d-divider-accent"></div>
+
+
+                        <!-- The following buttons are positioned absolutely -->
+                        <button class="btn-modal-back" data-type="back">
+                            <i class='bx bx-chevron-left bx-md' ></i>
+                        </button>
+                        <button class="btn-modal-close" data-type="close">
+                            <i class='bx bx-x bx-md'></i>
+                        </button>
                     
-                    <!-- Using a div as a decorative divider, can't use border of other elements
-                    because I want it to be less than full width -->
-                    <!-- <div class="div-modal-divider"></div> -->
-                    <ul class="ul-menu" id="ul-view-basket-items">
-                    </ul>
-                    <div class="div-modal-footer">
-                        <div class="div-modal-total" id="div-view-basket-total">
-                            <p>Total:</p>
-                            <p>£0.00</p>
-                        </div>
-                        <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
-                    </div>
-                    <button class="btn-modal-close" id="btn-close-view-basket" data-type="close">
-                        <i class='bx bx-x bx-md'></i>
-                    </button>
-                </div>
-            </dialog>
-
-            <!-- Modal: Checkout -->
-            <dialog class="modal" id="modal-checkout">
-                <h3 class="modal-title">Checkout</h3>
-                <button class="btn-modal-back" data-type="back">
-                    <i class='bx bx-chevron-left bx-md' ></i>
-                </button>
-                <button class="btn-modal-close" data-type="close">
-                    <i class='bx bx-x bx-md'></i>
-                </button>
-                <div id="modal-checkout-inner">
-                    <p>Total to pay <span id="span-checkout-total">$0</span></p>
-                    <form>
-                        <div>
+                        <!-- Credit card form -->
+                        <form class="f-card-det">
+                            <h4 class="h4-card-det">Card details</h4>
+                            
                             <label for="card-name">Name</label>
-                            <input id="card-name" placeholder="Name">
-                        </div>
-                        <div>
+                            <input class="i-card" id="card-name" placeholder="Name">
+                                                        
                             <label for="card-number">Card Number</label>
-                            <input id="card-number" placeholder="Card Number">
-                        </div>
-                        <div>
+                            <input class="i-card" id="card-number" placeholder="Card Number">
+                            
+                            <div class="d-card-det-exp">
+                                <label for="card-month">Expiry Month</label>
+                                <select class="s-card" name="Month" id="card-month">
+                                    <option value="">Month</option>
+                                    <option value="january">January</option>
+                                    <option value="february">February</option>
+                                    <option value="march">March</option>
+                                    <option value="april">April</option>
+                                    <option value="may">May</option>
+                                    <option value="june">June</option>
+                                    <option value="july">July</option>
+                                    <option value="august">August</option>
+                                    <option value="september">September</option>
+                                    <option value="october">October</option>
+                                    <option value="november">November</option>
+                                    <option value="december">December</option>
+                                </select>
+
+                                <label for="card-month">Expiry Year</label>
+                                <select class="s-card" name="Year" id="card-year">
+                                    <option value="">Year</option>
+                                    <option value="2016">2024</option>
+                                    <option value="2017">2025</option>
+                                    <option value="2018">2026</option>
+                                    <option value="2019">2027</option>
+                                    <option value="2020">2028</option>
+                                    <option value="2021">2029</option>
+                                    <option value="2022">2030</option>
+                                </select>
+                            </div>
+                            
                             <label for="card-ccv">CCV</label>
-                            <input id="card-ccv" placeholder="CCV">
+                            <div class="d-card-det-exp">
+                                <input class="i-card i-card-ccv" id="i-ccv" placeholder="CCV">
+                                <p class="p-ccv">3 or 4 digits usually found on the back of your card</p>
+                            </div>
+                        </form>
+                    
+                    <div class="div-modal-footer">
+                        <div class="d-modal-space-between" id="div-view-basket-total">
+                            <p>Total:</p>
+                            <p id="p-basket-total-b">£0.00</p>
                         </div>
-                    </form>
-                </div>
-        
-                <button id="btn-pay" data-type="pay">Pay</button>
-            </dialog>
-
-            <!-- Modal: Order Complete -->
-            <dialog class="modal" id="modal-order-complete">
-                <div id="div-modal-order-complete-inner">
-                    <div id="div-modal-order-complete-details">
-
+                        <button class="btn-modal-main" id="btn-pay" data-type="pay">Pay</button>
                     </div>
-                    <button data-type="back">Back to menu</button>
                 </div>
-            </dialog>
+                    
+                </dialog>
 
-            <!-- Modal: My Orders -->
-            <dialog class="modal" id="modal-my-orders">
-                <div id="div-modal-my-orders-inner">
+                <!-- Modal: Order Complete -->
+                <dialog class="modal" id="modal-order-complete">
+                    <div class="modal-inner">
+                        
+                        <h3 class="modal-title">Thank you</h3>
+                        <div class="d-divider d-divider-accent"></div>
+                        
+                        <div id="div-modal-order-complete-details">
+                            <!-- Order details will render here -->                        
+                        </div>
 
-                </div>
-                <button id="btn-close-my-orders">Close</button>
-            </dialog>
+                        <button class="btn-modal-main" data-type="close">Back to menu</button>
+                    </div>
+                </dialog>
 
-            <!-- Modal: Discounts -->
-            <dialog class="modal" id="modal-discounts">
-                <div id="div-modal-discounts-inner">
+                <!-- Modal: My Orders -->
+                <dialog class="modal" id="modal-my-orders">
+                    <div class="modal-inner">
+                        <h3 class="modal-title">Order history</h3>
+                        <div class="d-divider d-divider-accent"></div>
 
-                </div>
-                <button id="btn-back">Close</button>
-            </dialog>
+                        <div id="div-modal-my-orders-inner">
+                            <!-- Order history renders here -->
+                        </div>
+
+                        <button class="btn-modal-main" data-type="close">Close</button>
+                    </div>
+                </dialog>
+
+                <!-- Modal: Discounts -->
+                <dialog class="modal" id="modal-discounts">
+                    <ul class="ul-discounts" id="div-modal-discounts-inner">
+                        
+                    </ul>
+                    <button class="btn-modal-main" id="btn-back">Close</button>
+                </dialog>
         </div>
 	    <script src="index.js" type="module"></script>
     </body>

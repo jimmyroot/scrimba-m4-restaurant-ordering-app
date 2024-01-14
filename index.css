@@ -14,6 +14,7 @@ html {
 }
 
 :root {
+    --white: #FFFFFF;
     /* Primary colour */
     --darkest: #55301F;
     --light: #C8A899;
@@ -59,7 +60,8 @@ html {
 
 body {
     font-family: 'Merriweather Sans', sans-serif;
-    color: var(--darkest)
+    color: var(--darkest);
+    /* overflow-y: hidden; */
 }
 
 form > *,
@@ -193,10 +195,18 @@ i {
     padding: 20px 0;
 }
 
-.div-menu-item-divider {
-    border: 1px solid var(--light);
+.d-divider {
+    border-bottom: 1px solid;
     width: 94%;
-    margin: auto;
+    margin: 0 auto;
+}
+
+.d-divider-primary {
+    border-color: var(--light);
+}
+
+.d-divider-accent {
+    border-color: var(--accent-light);
 }
 
 .img-menu-item {
@@ -220,6 +230,7 @@ i {
 
 .span-menu-item-ingredients,
 .span-menu-item-price {
+    font-size: 16px;
     color: var(--darkest);
 }
 
@@ -229,9 +240,10 @@ i {
 
 .btn-add-item,
 .btn-remove-item {
-    border-radius: 50px;
-    padding: 13px;
+    border-radius: 60px;
+    padding: 14px 13px 12px 13px;
     align-self: center;
+    
 }
 
 .btn-add-item {
@@ -318,14 +330,21 @@ i {
 
 /* Modal Styles */
 .modal {
+    color: var(--accent-darkest);
+    font-size: 22px;
     background-color: var(--accent-lightest);
     border: none;
     border-radius: var(--int-br);
+    min-width: 510px;
     width: 510px;
+    min-height: 975px;
     height: 975px;
-    margin-top: 95px;
+    margin: 0 auto;
     padding: 25px;
     box-shadow: var(--shadow-modal);
+    position: absolute;
+    top: 94px;
+    left: 0;
 }
 
 .modal-inner {
@@ -333,22 +352,15 @@ i {
     flex-direction: column;
     justify-content: start;
     height: 100%;    
-    /* border: 5px solid pink;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 }
 
 .modal-title {
-    color: var(--accent-darkest);
+    /* color: var(--accent-darkest); */
     font-family: 'Crete Round', serif;
     font-size: 48px;
     width: 100%;
     text-align: center;
-    margin: 0 0 25px 0;
-}
-
-.div-modal-divider {
-    border: 1px solid var(--accent-light);
-    width: 94%;
-    margin: auto;
+    margin: -3px 0 0 0;
 }
 
 .btn-modal-close,
@@ -378,11 +390,6 @@ i {
     color: var(--lightest);
     border-radius: var(--int-br);
     padding: 30px 0;
-    /* margin-top: auto; */
-}
-
-.basket-name {
-    color: var(--accent-darkest);
 }
 
 .basket-ingredients,
@@ -397,21 +404,142 @@ i {
     flex-direction: column;
 }
 
-.div-modal-total {
+.d-modal-space-between {
     font-size: 24px;
     font-weight: 700;
-    color: var(--accent-darkest);
+    /* color: var(--accent-darkest); */
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
 
 .btn-modal-main,
-.div-modal-total {
+.d-modal-space-between {
     margin-top: auto;
 }
 
+/* Credit card input styling */
+.f-card-det {
+    display: flex;
+    font-size: 24px;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.d-card-det-exp {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.s-card {
+    flex-grow: 1;
+    width: 50%;
+}
+
+.i-card,
+.s-card {
+    background-color: var(--white);
+    padding: 18px 13px;
+    color: var(--accent-darkest);
+    border-radius: var(--int-br);
+    border: 1px solid var(--accent-light);
+}
+
+.s-card {
+    background: url('assets/arrow.png');
+    background-repeat: no-repeat;
+    background-size: 5%;
+    background-position: 85% 50%;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.i-card::placeholder {
+    color: var(--accent-light);
+}
+
+.i-card-ccv {
+    /* display: inline; */
+    width: 50%;
+}
+
+.p-ccv {
+    /* display: inline; */
+    width: 50%;
+    color: var(--accent-light);
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.f-card-det * {
+    font-weight: 300;
+}
+
+.f-card-det *:focus {
+    outline: none;
+    box-shadow: 0 0 1px 1px var(--accent-vivid);
+}
+
+.h4-card-det {
+    color: var(--accent-darkest);
+    font-weight: 400;
+    margin: 0;
+}
+
+.modal-title + .d-divider {
+    margin: 25px auto 0 auto;
+}
+
+.p-modal {
+    color: var(--accent-darkest);
+    margin-top: 25px;
+    line-height: 1.4;
+}
+
+.h4-your-order {
+    font-size: 28px;
+    color: var(--accent-darkest);
+    width: 100%;
+    text-align: center;
+    margin: 35px 0 10px 0;
+}
+
+.d-ordered-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.d-ordered-item + .d-divider {
+    margin-top: 25px;
+}
+
+.d-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+.ul-discounts {
+    list-style0
+    /* margin: 0; */
+    padding: 0;
+}
+
 /* Temporary styles */
+label {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
+    padding: 0;
+    border: 0;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+}
+
 button:hover {
     transform: scale(1.04)
 }
