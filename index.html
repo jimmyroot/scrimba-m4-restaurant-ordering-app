@@ -115,7 +115,7 @@
                         </button>
                     
                         <!-- Credit card form -->
-                        <form class="f-card-det">
+                        <form class="f-card-det" id="f-card-det">
                             <h4 class="h4-card-det">Card details</h4>
                             
                             <label for="card-name">Name</label>
@@ -145,13 +145,13 @@
                                 <label for="card-month">Expiry Year</label>
                                 <select class="s-card" name="Year" id="card-year">
                                     <option value="">Year</option>
-                                    <option value="2016">2024</option>
-                                    <option value="2017">2025</option>
-                                    <option value="2018">2026</option>
-                                    <option value="2019">2027</option>
-                                    <option value="2020">2028</option>
-                                    <option value="2021">2029</option>
-                                    <option value="2022">2030</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
                                 </select>
                             </div>
                             
@@ -194,9 +194,9 @@
                         <h3 class="modal-title">Order history</h3>
                         <div class="d-divider d-divider-accent"></div>
 
-                        <div id="div-modal-my-orders-inner">
-                            <!-- Order history renders here -->
-                        </div>
+                        <ul class="ul-my-orders" id="ul-my-orders">
+                        
+                        </ul>
 
                         <button class="btn-modal-main" data-type="close">Close</button>
                     </div>
@@ -204,9 +204,7 @@
 
                 <!-- Modal: Discounts -->
                 <dialog class="modal" id="modal-discounts">
-                    <ul class="ul-discounts" id="div-modal-discounts-inner">
-                        
-                    </ul>
+                    
                     <button class="btn-modal-main" id="btn-back">Close</button>
                 </dialog>
         </div>

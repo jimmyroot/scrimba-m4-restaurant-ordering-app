@@ -3,6 +3,7 @@
 // Todo 3: Fix the color of the ingredients lists on main page
 // Todo 4: Create a selection function for the bottom row of icons (use vivid color for selection)
 // Todo 5: Create star rating system
+// Todo 6: Discount code
 
 import { menuArray } from './data.js'
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
@@ -16,6 +17,7 @@ const modalOrderComplete = document.getElementById('modal-order-complete')
 const modalMyOrders = document.getElementById('modal-my-orders')
 const modalDiscounts = document.getElementById('modal-discounts')
 const btnCheckout = document.getElementById('btn-checkout')
+const formCardDet = document.querySelectorAll('#f-card-det')[0]
 
 // Init vars
 let basket = []
@@ -74,7 +76,6 @@ modalViewBasket.addEventListener('click', e => {
             showModal(modalViewBasket, false)
         },
         remove: () => {
-            console.log('fired')
             handleRemoveItemFromOrder(e.target.dataset.instanceId)
         },
     }
@@ -87,7 +88,7 @@ modalCheckout.addEventListener('click', e => {
 
     const handleClick = {
         pay: () => {
-            handlePayment()    
+            if (isFormComplete(formCardDet)) handlePayment()
         },
         back: () => {
             showModal(modalCheckout, false)
@@ -104,6 +105,13 @@ modalCheckout.addEventListener('click', e => {
 modalMyOrders.addEventListener('click', e => {
     const type = e.target.dataset.type
     if (type) showModal(modalMyOrders, false)
+})
+
+formCardDet.addEventListener('input', e => {
+    const input = e.target
+    console.log(input.classList)
+    console.log(Boolean(input.value))
+    Boolean(input.value) ? input.classList.remove('warning') : input.classList.add('warning')
 })
 
 // Render functions
@@ -209,7 +217,7 @@ const renderOrderComplete = (order) => {
 }
 
 const renderMyOrders = (myOrders) => {
-    document.getElementById('div-modal-my-orders-inner').innerHTML = myOrders.map((order, index, arr) => {
+    document.getElementById('ul-my-orders').innerHTML = myOrders.map((order, index, arr) => {
         const isLastIter = index + 1 === arr.length
         return `
             <li>
@@ -223,22 +231,6 @@ const renderMyOrders = (myOrders) => {
         `
     }).join('')
 }
-
-// HTML FUNCTIONS - maybe consolidate these into the render functions...
-// const getOrderHTML = (order) => {
-//     let html = order.map(item => {
-//         return `
-//             <p>${item.name}<button data-type="remove" data-instance-id="${item.instanceId}">Remove</button></p>
-//         `
-//     }).join('')
-    
-//     const htmlTotal = `
-//         <p>Total: £${getOrderTotal(order)}</p>
-//     `
-
-//     html += htmlTotal
-//     return html   
-// }
 
 // EVENT HANDLERS
 
@@ -281,6 +273,7 @@ const handleCheckout = (order) => {
 
 const handlePayment = () => {
     renderOrderComplete(basket)
+    formCardDet.reset()
     showModal(modalCheckout, false)
     showModal(modalOrderComplete, true)
 }
@@ -301,10 +294,6 @@ const handleReset = () => {
     showModal(modalOrderComplete, false)
 }
 
-const handleShowMyOrders = () => {
-    showModal(modalMyOrders, true)
-}
-
 // Helper functions
 const getOrderTotal = (order) => {
     if (order.length > 0) {
@@ -316,6 +305,17 @@ const getOrderTotal = (order) => {
     } else {
         return "0.00"
     }
+}
+
+const isFormComplete = form => {
+    const emptyInputs = [...form.elements].filter(element => !Boolean(element.value))
+
+    if (emptyInputs.length > 0) {
+        emptyInputs.forEach(input => input.classList.add('warning'))
+        return false
+    }
+
+    return true
 }
 
 const showModal = (modal, show) => {
