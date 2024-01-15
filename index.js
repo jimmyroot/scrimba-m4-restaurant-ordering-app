@@ -22,6 +22,11 @@ const formCardDet = document.querySelectorAll('#f-card-det')[0]
 // Init vars
 let basket = []
 let myOrders = []
+let discountMultiplier = 0
+const discountCodes = {
+    'JAN10': 0.9,
+    'OFF20': 0.8
+}
 
 // Set up event listeners
 document.getElementById('btn-view-basket').addEventListener('click', () => {
@@ -97,6 +102,9 @@ modalCheckout.addEventListener('click', e => {
         close: () => {
             showModal(modalCheckout, false)
         },
+        discount: () => {
+            handleApplyDiscount()
+        }
     }
     
     if (type) handleClick[type]()
@@ -161,19 +169,18 @@ const renderOrder = (basket) => {
         `
     }).join('')
 
-    const htmlTotal = `
-            <div class="d-modal-space-between">
-                <p>Total:</p>
-                <p id="p-basket-total">$${getOrderTotal(basket)}</p>
-            </div>
-            <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
-    `
-    
+    // const htmlTotal = `
+    //         <div class="d-modal-space-between">
+    //             <p>Total:</p>
+    //             <p id="p-basket-total">$${getOrderTotal(basket)}</p>
+    //         </div>
+    //         <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
+    // `
+    if (discountMultiplier > 0) document.getElementById('p-checkout-total').textContent = `Total (discount applied):`
     document.getElementById('ul-view-basket-items').innerHTML = html
-    // document.getElementById('div-view-basket-total').innerHTML = htmlTotal
     document.getElementById('span-item-count').textContent = basket.length
     document.getElementById('p-basket-total').textContent = `£${getOrderTotal(basket)}`
-    document.getElementById('p-basket-total-b').textContent = `£${getOrderTotal(basket)}`
+    document.getElementById('p-basket-total-b').textContent = `${getOrderTotal(basket)}`
     document.getElementById('span-basket-total').textContent = `£${getOrderTotal(basket)}`
     enableButtons([btnCheckout], basket.length > 0)
 }
@@ -192,13 +199,7 @@ const renderFilterBtns = () => {
 }
 
 const renderOrderComplete = (order) => {
-    let html = `
-        <p class="p-modal"->Your order is on it's way! Thank you for visiting. We hope to see you again.</p>
-        <h4 class="h4-your-order">Your order</h4>
-        
-    `
-
-    html += order.map(item => {
+    let html = order.map(item => {
         return `
         <div class="d-ordered-item">
             <p>${item.name}</p><p>£${item.price.toFixed(2)}</p>
@@ -207,13 +208,15 @@ const renderOrderComplete = (order) => {
     }).join('')
 
     html += `
-        <div class="d-divider d-divider-accent"></div>
-        <div class="d-total">
-            <p>Total:</p> 
-            <p>£${getOrderTotal(order)}</p>
-        </div>
+        <li>
+            <div class="d-divider d-divider-accent"></div>
+            <div class="d-total">
+                <p>Total:</p> 
+                <p>£${getOrderTotal(order)}</p>
+            </div>
+        </li>
     `
-    document.getElementById('div-modal-order-complete-details').innerHTML = html
+    document.getElementById('u-modal-order-complete-details').innerHTML = html
 }
 
 const renderMyOrders = (myOrders) => {
@@ -289,19 +292,31 @@ const handleReset = () => {
     }
     myOrders.push(pastOrderObj)
     basket = []
+    discountMultiplier = 0
     renderOrder(basket)
     renderMyOrders(myOrders)
     showModal(modalOrderComplete, false)
 }
 
+const handleApplyDiscount = () => {
+    const code = document.getElementById('in-discount').value
+    
+    if (Object.keys(discountCodes).includes(code)) {
+        discountMultiplier = discountCodes[code]
+        renderOrder(basket)
+    }
+}
+
 // Helper functions
-const getOrderTotal = (order) => {
+const getOrderTotal = order => {
     if (order.length > 0) {
-        return order.map(
+        let total = order.map(
             item => item.price
         ).reduce(
             (total, price) => total + price
-        ).toFixed(2)
+        )
+        if (discountMultiplier) total *= discountMultiplier
+        return total.toFixed(2)
     } else {
         return "0.00"
     }

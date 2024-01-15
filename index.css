@@ -182,12 +182,10 @@ i {
 }
 
 /* Menu list styles */
-.ul-menu {
+.ul-menu, .ul-order {
     list-style-type: none;
     display: flex;
     flex-direction: column;
-    padding: 0;
-    margin: 0;
 }
 
 .li-menu-item {
@@ -340,6 +338,7 @@ i {
     width: 510px;
     min-height: 975px;
     height: 975px;
+    overflow-y: hidden;
     margin: 0 auto;
     padding: 25px;
     box-shadow: var(--shadow-modal);
@@ -356,7 +355,6 @@ i {
 }
 
 .modal-title {
-    /* color: var(--accent-darkest); */
     font-family: 'Crete Round', serif;
     font-size: 48px;
     width: 100%;
@@ -364,8 +362,27 @@ i {
     margin: -3px 0 0 0;
 }
 
+.el-thin-scrollbar {
+    margin: 0 -18px 25px 0;
+    padding: 0 11px 0 0;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.el-thin-scrollbar::-webkit-scrollbar {
+    background-color: transparent;
+    width: 7px;
+}
+
+.el-thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--accent-darkest);
+    opacity: 0.6;
+    border-radius: 5px;
+}
+
 .btn-modal-close,
-.btn-modal-back {
+.btn-modal-back,
+.btn-modal-discount {
     background-color: var(--accent-darkest);
     color: var(--accent-lightest);
     border-radius: var(--crcl-br);
@@ -384,6 +401,14 @@ i {
     left: 25px;
 }
 
+.btn-modal-discount {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    z-index: 2;
+    padding: 4px;
+}
+
 .btn-modal-main {
     background-color: var(--darkest);
     font-family: 'Crete Round', serif;
@@ -391,6 +416,7 @@ i {
     color: var(--lightest);
     border-radius: var(--int-br);
     padding: 30px 0;
+    margin-top: 25px;
 }
 
 .basket-ingredients,
@@ -414,10 +440,10 @@ i {
     margin-bottom: 20px;
 }
 
-.btn-modal-main,
+/* .btn-modal-main,
 .d-modal-space-between {
     margin-top: auto;
-}
+} */
 
 /* Credit card input styling */
 .f-card-det {
@@ -440,7 +466,8 @@ i {
 }
 
 .i-card,
-.s-card {
+.s-card,
+.in-discount {
     background-color: var(--white);
     padding: 18px 13px;
     color: var(--accent-darkest);
@@ -458,17 +485,16 @@ i {
     appearance: none;
 }
 
-.i-card::placeholder {
+.i-card::placeholder,
+.in-discount::placeholder {
     color: var(--accent-light);
 }
 
 .i-card-ccv {
-    /* display: inline; */
     width: 50%;
 }
 
 .p-ccv {
-    /* display: inline; */
     width: 50%;
     color: var(--accent-light);
     font-size: 18px;
@@ -488,6 +514,10 @@ i {
     color: var(--accent-darkest);
     font-weight: 400;
     margin: 0;
+}
+
+.in-discount {
+    width: 100%;
 }
 
 .warning {
@@ -526,6 +556,10 @@ i {
     display: flex;
     justify-content: space-between;
     margin-top: 25px;
+}
+
+.dv-discount {
+    position: relative;
 }
 
 .ul-my-orders {

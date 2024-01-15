@@ -80,11 +80,8 @@
                     <div class="modal-inner">
                         <h3 class="modal-title">Your basket</h3>
                         <div class="d-divider d-divider-accent"></div>
-                        
-                        <!-- Using a div as a decorative divider, can't use border of other elements
-                        because I want it to be less than full width -->
-                        <!-- <div class="d-modal-divider"></div> -->
-                        <ul class="ul-menu" id="ul-view-basket-items">
+                    
+                        <ul class="ul-order el-thin-scrollbar" id="ul-view-basket-items">
                         </ul>
                         <div class="div-modal-footer">
                             <div class="d-modal-space-between" id="div-view-basket-total">
@@ -161,11 +158,19 @@
                                 <p class="p-ccv">3 or 4 digits usually found on the back of your card</p>
                             </div>
                         </form>
-                    
+
                     <div class="div-modal-footer">
                         <div class="d-modal-space-between" id="div-view-basket-total">
-                            <p>Total:</p>
+                            <p id="p-checkout-total"">Total:</p>
                             <p id="p-basket-total-b">£0.00</p>
+                        </div>
+                        
+                        <div class="dv-discount">
+                            <label for="in-discount">Discount code</label>
+                            <input type="text" class="in-discount" id="in-discount" placeholder="Discount code?">
+                            <button class="btn-modal-discount" data-type="discount">
+                                <i class='bx bx-chevron-right bx-md' ></i>
+                            </button>    
                         </div>
                         <button class="btn-modal-main" id="btn-pay" data-type="pay">Pay</button>
                     </div>
@@ -179,11 +184,13 @@
                         
                         <h3 class="modal-title">Thank you</h3>
                         <div class="d-divider d-divider-accent"></div>
-                        
-                        <div id="div-modal-order-complete-details">
-                            <!-- Order details will render here -->                        
-                        </div>
+                        <p class="p-modal"->Your order is on it's way! Thank you for visiting. We hope to see you again.</p>
+                        <h4 class="h4-your-order">Your order</h4>
 
+                        <ul class="el-thin-scrollbar" id="u-modal-order-complete-details">
+                            <!-- Order details will render here -->                        
+                        </ul>
+                        
                         <button class="btn-modal-main" data-type="close">Back to menu</button>
                     </div>
                 </dialog>
@@ -193,18 +200,16 @@
                     <div class="modal-inner">
                         <h3 class="modal-title">Order history</h3>
                         <div class="d-divider d-divider-accent"></div>
-
                         <ul class="ul-my-orders" id="ul-my-orders">
-                        
+                            <!-- Order history renders here -->
                         </ul>
-
                         <button class="btn-modal-main" data-type="close">Close</button>
                     </div>
                 </dialog>
 
                 <!-- Modal: Discounts -->
                 <dialog class="modal" id="modal-discounts">
-                    
+                   
                     <button class="btn-modal-main" id="btn-back">Close</button>
                 </dialog>
         </div>
