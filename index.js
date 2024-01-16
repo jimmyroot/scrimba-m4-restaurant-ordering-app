@@ -1,5 +1,3 @@
-// Todo 1: Fix ul scroll in modal when too many items added to list
-// Todo 2: Align the minus logo in the middle of remove button, make sure it's a circle
 // Todo 3: Fix the color of the ingredients lists on main page
 // Todo 4: Create a selection function for the bottom row of icons (use vivid color for selection)
 // Todo 5: Create star rating system
@@ -8,20 +6,19 @@
 import { menuArray } from './data.js'
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
 
-// Grab what we need from the DOM (only if we use it more than once in code)
+// Grab what we need from the DOM (only if we use it more than once in the rest of our code)
 const ulMenu = document.getElementById('ul-menu')
 const ulMenuFilter = document.getElementById('ul-menu-filter')
-const modalViewBasket = document.getElementById('modal-view-basket')
+const modalBasket = document.getElementById('modal-basket')
 const modalCheckout = document.getElementById('modal-checkout')
-const modalOrderComplete = document.getElementById('modal-order-complete')
+const modalOrderComplete = document.getElementById('modal-order-confirmed')
 const modalMyOrders = document.getElementById('modal-my-orders')
 const modalDiscounts = document.getElementById('modal-discounts')
-const btnCheckout = document.getElementById('btn-checkout')
 const formCardDet = document.querySelectorAll('#f-card-det')[0]
 
 // Init vars
 let basket = []
-let myOrders = []
+let orderHistory = []
 let discountMultiplier = 0
 const discountCodes = {
     'JAN10': 0.9,
@@ -29,12 +26,8 @@ const discountCodes = {
 }
 
 // Set up event listeners
-document.getElementById('btn-view-basket').addEventListener('click', () => {
-    showModal(modalViewBasket, true)
-})
-
 document.getElementById('btn-close-view-basket').addEventListener('click', () => {
-    showModal(modalViewBasket, false)
+    showModal(modalBasket, false)
 })
 
 document.getElementById('b-nav-my-orders').addEventListener('click', () => {
@@ -47,11 +40,8 @@ document.getElementById('div-order-type').addEventListener('click', e => {
 })
 
 document.getElementById('b-nav-discounts').addEventListener('click', () => {
+    renderDiscounts(discountCodes)
     showModal(modalDiscounts, true)
-})
-
-btnCheckout.addEventListener('click', () => {
-    handleCheckout()
 })
 
 ulMenuFilter.addEventListener('click', e => {
@@ -64,13 +54,19 @@ ulMenu.addEventListener('click', e => {
     if (id) handleAddItemToOrder(id)
 })
 
+document.getElementById('sn-basket').addEventListener('click', e => {
+    const type = e.target.dataset.type
+    if (type === 'basket') showModal(modalBasket, true)
+})
+
 modalOrderComplete.addEventListener('click', e => {
     const type = e.target.dataset.type
+
+    // When order confirmation is closed by user, reset the ordering system
     if (type) handleReset()
 })
 
-modalViewBasket.addEventListener('click', e => {
-    console.log(e.target.dataset.type)
+modalBasket.addEventListener('click', e => {
     const type = e.target.dataset.type
 
     const handleClick = {
@@ -78,7 +74,7 @@ modalViewBasket.addEventListener('click', e => {
             handleCheckout()
         },
         close: () => {
-            showModal(modalViewBasket, false)
+            showModal(modalBasket, false)
         },
         remove: () => {
             handleRemoveItemFromOrder(e.target.dataset.instanceId)
@@ -96,8 +92,9 @@ modalCheckout.addEventListener('click', e => {
             if (isFormComplete(formCardDet)) handlePayment()
         },
         back: () => {
+            renderBasket(basket)
             showModal(modalCheckout, false)
-            showModal(modalViewBasket, true)
+            showModal(modalBasket, true)
         },
         close: () => {
             showModal(modalCheckout, false)
@@ -110,6 +107,11 @@ modalCheckout.addEventListener('click', e => {
     if (type) handleClick[type]()
 })
 
+modalDiscounts.addEventListener('click', e => {
+    const type = e.target.dataset.type
+    if (type === 'close') showModal(modalDiscounts, false)
+})
+
 modalMyOrders.addEventListener('click', e => {
     const type = e.target.dataset.type
     if (type) showModal(modalMyOrders, false)
@@ -117,8 +119,6 @@ modalMyOrders.addEventListener('click', e => {
 
 formCardDet.addEventListener('input', e => {
     const input = e.target
-    console.log(input.classList)
-    console.log(Boolean(input.value))
     Boolean(input.value) ? input.classList.remove('warning') : input.classList.add('warning')
 })
 
@@ -129,60 +129,159 @@ const renderMenu = (menu, category = 'coffee') => {
         const isLastIter = index + 1 === arr.length
         return `
             <li class="li-menu-item">
-                <img class="img-menu-item" src="${imageURL}">
+                <img class="img-item" src="${imageURL}">
                 <div>
-                    <span class="span-menu-item-name">${name}</span>
-                    <span class="span-menu-item-ingredients">
+                    <span class="spn-item-name">${name}</span>
+                    <span class="spn-item-dets">
                         ${ingredients.map(ingredient => ingredient).join(', ')}
                     </span>
-                    <span class="span-menu-item-price">£${price.toFixed(2)}</span>
+                    <span class="spn-item-dets">£${price.toFixed(2)}</span>
                 </div>
-                <button class="btn-add-item" data-id="${id}">
+                <button class="btn-add" data-id="${id}">
                     <i class='bx bx-plus bx-md'></i>
                 </button>
             </li>
-            ${isLastIter ? '' : '<div class="d-divider d-divider-primary"></div>'}
+            ${isLastIter ? '' : '<div class="div-divider div-divider-primary"></div>'}
         `
     }).join('')
 }
 
-const renderOrder = (basket) => {
-    const html = basket.map((item, index, arr) => {
-        // console.log(item)
+const renderBasket = basket => {
+    let htmlDiscount = ``
+
+    if (discountMultiplier > 0) {
+        const percentDiscount = getDiscountPercentage(discountMultiplier)
+        htmlDiscount = `
+            <span class="spn-discount">
+                (${percentDiscount}% discount applied)
+            </span>
+        `
+    }
+
+    const htmlBasket = basket.map((item, index, arr) => {
         const {name, ingredients, price, imageURL, instanceId} = item
         const isLastIter = index + 1 === arr.length
         return `
             <li class="li-menu-item">
-                <img class="img-menu-item" src="${imageURL}">
+                <img class="img-item" src="${imageURL}">
                 <div>
-                    <span class="span-menu-item-name">${name}</span>
-                    <span class="span-menu-item-ingredients basket-ingredients">
+                    <span class="spn-item-name">${name}</span>
+                    <span class="spn-item-dets">
                         ${ingredients.map(ingredient => ingredient).join(', ')}
                     </span>
-                    <span class="span-menu-item-price basket-price">£${price.toFixed(2)}</span>
+                    <span class="spn-item-dets">£${price.toFixed(2)}</span>
                 </div>
-                <button class="btn-remove-item" data-instance-id="${instanceId}" data-type="remove">
+                <button class="btn-remove" data-instance-id="${instanceId}" data-type="remove">
                     <i class='bx bx-minus bx-sm'></i>
                 </button>
             </li>
-            ${isLastIter ? '' : '<div class="d-divider d-divider-accent"></div>'}
+            ${isLastIter ? '' : '<div class="div-divider div-divider-accent"></div>'}
         `
     }).join('')
 
-    // const htmlTotal = `
-    //         <div class="d-modal-space-between">
-    //             <p>Total:</p>
-    //             <p id="p-basket-total">$${getOrderTotal(basket)}</p>
-    //         </div>
-    //         <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
-    // `
-    if (discountMultiplier > 0) document.getElementById('p-checkout-total').textContent = `Total (discount applied):`
-    document.getElementById('ul-view-basket-items').innerHTML = html
-    document.getElementById('span-item-count').textContent = basket.length
-    document.getElementById('p-basket-total').textContent = `£${getOrderTotal(basket)}`
-    document.getElementById('p-basket-total-b').textContent = `${getOrderTotal(basket)}`
-    document.getElementById('span-basket-total').textContent = `£${getOrderTotal(basket)}`
-    enableButtons([btnCheckout], basket.length > 0)
+    const htmlTotal = `
+        <p>Total: ${htmlDiscount}</p>
+        <p id="p-basket-total">£${getOrderTotal(basket)}</p>
+    `
+    // console.log(htmlTotal)
+
+    document.getElementById('ul-view-basket-items').innerHTML = htmlBasket
+    document.getElementById('div-basket-total').innerHTML = htmlTotal
+    
+    document.getElementById('div-checkout-total').innerHTML = htmlTotal
+    enableButtons([document.getElementById('btn-checkout')], basket.length > 0)
+    renderViewBasketBtn(basket)
+}
+
+const renderCheckout = basket => {
+    let htmlDiscount = ``
+
+    if (discountMultiplier > 0) {
+        const percentDiscount = getDiscountPercentage(discountMultiplier)
+        htmlDiscount = `
+            <span class="spn-discount">
+                (${percentDiscount}% discount applied)
+            </span>
+        `
+    }
+
+    const htmlCheckoutTotal = `
+        <p>Total: ${htmlDiscount}</p>
+        <p id="p-basket-total">£${getOrderTotal(basket)}</p>
+    `
+    document.getElementById('div-checkout-total').innerHTML = htmlCheckoutTotal
+}
+
+const renderOrderConfirmed = basket => {
+    let htmlDiscount = ``
+
+    if (discountMultiplier > 0) {
+        const percentDiscount = getDiscountPercentage(discountMultiplier)
+        htmlDiscount = `
+            <span class="spn-discount">
+                (${percentDiscount}% discount applied)
+            </span>
+        `
+    }
+
+    let html = basket.map(item => {
+        return `
+            <div class="d-ordered-item">
+                <p>${item.name}</p><p>£${item.price.toFixed(2)}</p>
+            </div>
+        `
+    }).join('')
+
+    html += `
+        <li>
+            <div class="div-divider div-divider-accent"></div>
+            <div class="d-total" id="div-order-confirmed-total">
+                <p>Total: ${htmlDiscount}</p>
+                <p>£${getOrderTotal(basket)}</p>
+            </div>
+        </li>
+    `
+    document.getElementById('u-modal-order-complete-details').innerHTML = html
+}
+
+const renderOrderHistory = orderHistory => {
+    document.getElementById('ul-order-history').innerHTML = orderHistory.map((order, index, arr) => {
+        const isLastIter = index + 1 === arr.length
+        return `
+            <li class="li-order-history">
+                <div class="div-space-between">
+                        <p>${order.date}</p>
+                        <p>£${order.total}</p>
+                </div>
+                <p>${order.items.map(item => item).join(', ')}</p>
+            </li>
+            ${isLastIter ? '' : '<div class="div-divider div-divider-accent"></div>'}
+        `
+    }).join('')
+}
+
+const renderDiscounts = discountCodes => {
+    const html = Object.entries(discountCodes).map((obj, index, arr) => {
+        const isLastIter = index + 1 === arr.length
+        const percentage = (100-(obj[1] / 1 * 100))
+        return `
+            <li class="li-discount-code">
+                <p>Enjoy ${percentage}% off with code <span class="spn-code">${obj[0]}</span></p>
+            </li>
+            ${isLastIter ? '' : '<div class="div-divider div-divider-accent"></div>'}
+        `
+    }).join('')
+    document.getElementById('ul-discounts').innerHTML = html
+}
+
+const renderViewBasketBtn = basket => {
+    document.getElementById('sn-basket').innerHTML = `
+        <button class="btn btn-view-basket" id="btn-view-basket" data-type="basket">
+            <i class="bx bx-basket bx-lg"></i>
+            <span class="span-item-count">${basket.length}</span>
+            <span>View basket</span>
+            <span class="span-basket-total">£${getOrderTotal(basket)}</span>
+        </button>`
 }
 
 const renderFilterBtns = () => {
@@ -198,43 +297,6 @@ const renderFilterBtns = () => {
     }).join('')
 }
 
-const renderOrderComplete = (order) => {
-    let html = order.map(item => {
-        return `
-        <div class="d-ordered-item">
-            <p>${item.name}</p><p>£${item.price.toFixed(2)}</p>
-        </div>
-        `
-    }).join('')
-
-    html += `
-        <li>
-            <div class="d-divider d-divider-accent"></div>
-            <div class="d-total">
-                <p>Total:</p> 
-                <p>£${getOrderTotal(order)}</p>
-            </div>
-        </li>
-    `
-    document.getElementById('u-modal-order-complete-details').innerHTML = html
-}
-
-const renderMyOrders = (myOrders) => {
-    document.getElementById('ul-my-orders').innerHTML = myOrders.map((order, index, arr) => {
-        const isLastIter = index + 1 === arr.length
-        return `
-            <li>
-                <div class="d-modal-space-between">
-                        <p>${order.date}</p>
-                        <p>£${order.total}</p>
-                </div>
-                <p>${order.items.map(item => item).join(', ')}</p>
-            </li>
-            ${isLastIter ? '' : '<div class="d-divider d-divider-accent"></div>'}
-        `
-    }).join('')
-}
-
 // EVENT HANDLERS
 
 // Add item to order; here we are using structuredClone() to create a deep copy of
@@ -245,7 +307,7 @@ const handleAddItemToOrder = (id) => {
     let deepCopyOfItem = structuredClone(item)
     deepCopyOfItem.instanceId = uuidv4()
     basket.push(deepCopyOfItem)
-    renderOrder(basket)
+    renderBasket(basket)
 }
 
 const handleRemoveItemFromOrder = (instanceIdToRemove) => {
@@ -255,7 +317,7 @@ const handleRemoveItemFromOrder = (instanceIdToRemove) => {
         return arr
     }, [])
 
-    renderOrder(basket)
+    renderBasket(basket)
 }
 
 const handleSelectOrderType = target => {
@@ -270,19 +332,15 @@ const handleFilterSelection = (el, filter) => {
 }
 
 const handleCheckout = (order) => {
-    showModal(modalViewBasket, false)
+    showModal(modalBasket, false)
     showModal(modalCheckout, true)
 }
 
 const handlePayment = () => {
-    renderOrderComplete(basket)
-    formCardDet.reset()
-    showModal(modalCheckout, false)
-    showModal(modalOrderComplete, true)
-}
+    
 
-const handleReset = () => {
-    const pastOrderObj = {
+    // Save the order details into the orderHistory array
+    const orderObj = {
         items: basket.map(item => item.name),
         total: getOrderTotal(basket),
         date: new Date().toLocaleDateString('en-GB', {
@@ -290,21 +348,41 @@ const handleReset = () => {
             day: 'numeric',
         })
     }
-    myOrders.push(pastOrderObj)
+    orderHistory.push(orderObj)
+
+    // Render order completion screen before we show it
+    renderOrderConfirmed(basket)
+
+    // Reset the card details form, hide checkout, show order confirmation
+    formCardDet.reset()
+    showModal(modalCheckout, false)
+    showModal(modalOrderComplete, true)
+}
+
+const handleReset = () => {
     basket = []
     discountMultiplier = 0
-    renderOrder(basket)
-    renderMyOrders(myOrders)
+    renderBasket(basket)
+    renderOrderHistory(orderHistory)
     showModal(modalOrderComplete, false)
 }
 
 const handleApplyDiscount = () => {
-    const code = document.getElementById('in-discount').value
+    
+    const iptDiscount = document.getElementById('ipt-discount')
+    const code = iptDiscount.value
     
     if (Object.keys(discountCodes).includes(code)) {
         discountMultiplier = discountCodes[code]
-        renderOrder(basket)
+        if (iptDiscount.classList.contains('warning')) iptDiscount.classList.remove('warning')
+        renderCheckout(basket)
+    } else {
+        discountMultiplier = 0
+        iptDiscount.classList.add('warning')
+        renderCheckout(basket)
     }
+
+    iptDiscount.value = ''
 }
 
 // Helper functions
@@ -341,6 +419,10 @@ const enableButtons = (buttons, doEnable) => {
     buttons.length > 0 && buttons.forEach(button => button.disabled = !doEnable)
 }
 
+const getDiscountPercentage = discountMultiplier => {
+    return (100-(discountMultiplier / 1 * 100))
+}
+
 renderMenu(menuArray, 'coffee')
-renderOrder(basket)
+renderBasket(basket)
 renderFilterBtns()

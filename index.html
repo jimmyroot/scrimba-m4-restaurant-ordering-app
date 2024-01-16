@@ -1,3 +1,7 @@
+<!-- TODO 1: Change section order to section basket -->
+<!-- TODO 2: Change section order parameters to section menu options -->
+<!-- TODO 3: Tidy up the modals -->
+
 <html>
     <head>
         <title>Bean & Gone</title>
@@ -23,7 +27,7 @@
                 </p>
             </header>
             <main>
-                <section class="section-order-parameters">
+                <section>
                     <div class="div-order-type" id="div-order-type">
                         <button class="btn-order-type" data-id="togo"><i class="bx bx-coffee-togo bx-md"></i>Order to go</button>
                         <button class="btn-order-type btn-selected" data-id="table"><i class="bx bx-qr-scan bx-md" ></i>Order to table</button>
@@ -37,13 +41,13 @@
                         
                     </ul>
                 </section>
-                <section class="section-order" id="section-order">
-                    <button class="btn btn-view-order" id="btn-view-basket">
+                <section class="section-order" id="sn-basket"> 
+                    <!-- <button class="btn btn-view-order" id="btn-view-basket">
                         <i class="bx bx-basket bx-lg"></i>
                         <span class="span-item-count" id="span-item-count">0</span>
                         <span>View basket</span>
                         <span class="span-basket-total" id="span-basket-total">£0.00</span>
-                    </button>
+                    </button> -->
                 </section>
             </main>
             <footer>
@@ -76,23 +80,25 @@
             </footer>
 
                 <!-- Modal: View Basket -->
-                <dialog class="modal" id="modal-view-basket">
+                <dialog class="modal" id="modal-basket">
                     <div class="modal-inner">
                         <h3 class="modal-title">Your basket</h3>
-                        <div class="d-divider d-divider-accent"></div>
-                    
-                        <ul class="ul-order el-thin-scrollbar" id="ul-view-basket-items">
-                        </ul>
-                        <div class="div-modal-footer">
-                            <div class="d-modal-space-between" id="div-view-basket-total">
-                                <p>Total:</p>
-                                <p id="p-basket-total">£0.00</p>
-                            </div>
-                            <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
-                        </div>
+                        <div class="div-divider div-divider-accent"></div>
+
+                        <!-- Close button positioned absolutely -->
                         <button class="btn-modal-close" id="btn-close-view-basket" data-type="close">
                             <i class='bx bx-x bx-md'></i>
                         </button>
+                    
+                        <ul class="ul-order el-thin-scrollbar" id="ul-view-basket-items">
+                            <!-- Basket items will render here -->
+                        </ul>
+                        <div class="div-modal-footer" id="dv-modal-basket-footer">
+                            <div class="div-space-between" id="div-basket-total">
+                                <!-- Total renders here -->
+                            </div>
+                            <button class="btn-modal-main" id="btn-checkout" data-type="checkout">Checkout</button>
+                        </div>
                     </div>
                 </dialog>
 
@@ -100,7 +106,7 @@
                 <dialog class="modal" id="modal-checkout">
                     <div class="modal-inner">
                         <h3 class="modal-title">Checkout</h3>
-                        <div class="d-divider d-divider-accent"></div>
+                        <div class="div-divider div-divider-accent"></div>
 
 
                         <!-- The following buttons are positioned absolutely -->
@@ -160,14 +166,14 @@
                         </form>
 
                     <div class="div-modal-footer">
-                        <div class="d-modal-space-between" id="div-view-basket-total">
-                            <p id="p-checkout-total"">Total:</p>
-                            <p id="p-basket-total-b">£0.00</p>
+                        <div class="div-space-between" id="div-checkout-total">
+                            <!-- <p id="p-checkout-total"">Total:</p>
+                            <p id="p-basket-total-b">£0.00</p> -->
                         </div>
                         
                         <div class="dv-discount">
-                            <label for="in-discount">Discount code</label>
-                            <input type="text" class="in-discount" id="in-discount" placeholder="Discount code?">
+                            <label for="ipt-discount">Discount code</label>
+                            <input type="text" class="ipt-discount" id="ipt-discount" placeholder="Discount code?">
                             <button class="btn-modal-discount" data-type="discount">
                                 <i class='bx bx-chevron-right bx-md' ></i>
                             </button>    
@@ -179,11 +185,11 @@
                 </dialog>
 
                 <!-- Modal: Order Complete -->
-                <dialog class="modal" id="modal-order-complete">
+                <dialog class="modal" id="modal-order-confirmed">
                     <div class="modal-inner">
-                        
-                        <h3 class="modal-title">Thank you</h3>
-                        <div class="d-divider d-divider-accent"></div>
+                        <h3 class="modal-title">Thank you</i></h3>
+                        <div class="div-divider div-divider-accent"></div>
+
                         <p class="p-modal"->Your order is on it's way! Thank you for visiting. We hope to see you again.</p>
                         <h4 class="h4-your-order">Your order</h4>
 
@@ -195,12 +201,12 @@
                     </div>
                 </dialog>
 
-                <!-- Modal: My Orders -->
+                <!-- Modal: Order History -->
                 <dialog class="modal" id="modal-my-orders">
                     <div class="modal-inner">
                         <h3 class="modal-title">Order history</h3>
-                        <div class="d-divider d-divider-accent"></div>
-                        <ul class="ul-my-orders" id="ul-my-orders">
+                        <div class="div-divider div-divider-accent"></div>
+                        <ul class="ul-order-history" id="ul-order-history">
                             <!-- Order history renders here -->
                         </ul>
                         <button class="btn-modal-main" data-type="close">Close</button>
@@ -209,8 +215,14 @@
 
                 <!-- Modal: Discounts -->
                 <dialog class="modal" id="modal-discounts">
-                   
-                    <button class="btn-modal-main" id="btn-back">Close</button>
+                    <div class="modal-inner">
+                        <h3 class="modal-title">For you <i class='bx bxs-donate-heart bx-lg' ></i></h3>
+                        <div class="div-divider div-divider-accent"></div>
+                        <ul class="ul-discounts" id="ul-discounts">
+                            <!-- Discounts get rendered here -->
+                        </ul>
+                        <button class="btn-modal-main" data-type="close">Close</button>
+                    </div>
                 </dialog>
         </div>
 	    <script src="index.js" type="module"></script>
