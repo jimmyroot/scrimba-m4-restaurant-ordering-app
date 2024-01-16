@@ -41,7 +41,7 @@
                         
                     </ul>
                 </section>
-                <section class="section-order" id="sn-basket"> 
+                <section id="sec-basket"> 
                     <!-- <button class="btn btn-view-order" id="btn-view-basket">
                         <i class="bx bx-basket bx-lg"></i>
                         <span class="span-item-count" id="span-item-count">0</span>
@@ -51,7 +51,7 @@
                 </section>
             </main>
             <footer>
-                <ul class="ul-footer-nav">
+                <ul class="ul-footer-nav" id="ul-footer-nav">
                     <li class="li-footer-nav">
                         <button>
                             <img class="img-account" src="/assets/jimmy.png" User avatar">
@@ -59,13 +59,13 @@
                         </button>
                     </li>
                     <li class="li-footer-nav">
-                        <button id="b-nav-my-orders">
+                        <button data-type="orders">
                             <i class='bx bx-receipt bx-lg'></i>
                             <span>My Orders</span>
                         </button>
                     </li>
                     <li class="li-footer-nav">
-                        <button id="b-nav-discounts">
+                        <button data-type="discounts">
                             <i class='bx bx-gift bx-lg'></i>
                             <span>Discounts</span>
                         </button>
@@ -90,7 +90,7 @@
                             <i class='bx bx-x bx-md'></i>
                         </button>
                     
-                        <ul class="ul-order el-thin-scrollbar" id="ul-view-basket-items">
+                        <ul class="ul-order el-thin-scrollbar" id="ul-basket-items">
                             <!-- Basket items will render here -->
                         </ul>
                         <div class="div-modal-footer" id="dv-modal-basket-footer">
@@ -107,7 +107,6 @@
                     <div class="modal-inner">
                         <h3 class="modal-title">Checkout</h3>
                         <div class="div-divider div-divider-accent"></div>
-
 
                         <!-- The following buttons are positioned absolutely -->
                         <button class="btn-modal-back" data-type="back">
@@ -184,8 +183,8 @@
                     
                 </dialog>
 
-                <!-- Modal: Order Complete -->
-                <dialog class="modal" id="modal-order-confirmed">
+                <!-- Modal: Order Confirmation -->
+                <dialog class="modal" id="modal-order-confirmation">
                     <div class="modal-inner">
                         <h3 class="modal-title">Thank you</i></h3>
                         <div class="div-divider div-divider-accent"></div>
@@ -197,7 +196,7 @@
                             <!-- Order details will render here -->                        
                         </ul>
                         
-                        <button class="btn-modal-main" data-type="close">Back to menu</button>
+                        <button class="btn-modal-main" data-type="reset">Back to menu</button>
                     </div>
                 </dialog>
 

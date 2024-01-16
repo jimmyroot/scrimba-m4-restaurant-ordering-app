@@ -19,7 +19,7 @@ html {
     /* Primary colour */
     --darkest: #55301F;
     --light: #C8A899;
-    --vivid: #FF8A00;
+    --vivid: #A10702;
     --lightest: #FFFAF7;
     --bg: #ffffff;
     /* Accent colour */
@@ -106,6 +106,7 @@ h1 {
 }
 
 i,
+button > *,
 button:disabled,
 .btn-view-basket > * {
     pointer-events: none;
@@ -321,10 +322,16 @@ button:disabled,
     justify-content: space-between;
 }
 
+.li-footer-nav .selected {
+    /* border-radius: var(--ißnt-br); */
+    color: var(--accent-darkest);
+    border-bottom: 5px solid var(--accent-darkest);
+}
+
 .li-footer-nav span {
     font-size: 14px;
     font-weight: 700;
-    padding: 5px;
+    padding: 10px;
 }
 
 .img-account {
@@ -591,14 +598,20 @@ button:disabled,
     display: inline-block;
     padding: 20px;
     margin: 15px;
-    border-radius: 10px;
+    border-radius: var(--int-br);
     font-weight: 700;
     background-color: var(--accent-darkest);
     color: var(--accent-vivid);
 }
 
 .spn-discount {
+    display: inline;
     font-size: 18px;
+    background: var(--accent-darkest);
+    color: var(--accent-vivid);
+    border-radius: var(--int-br-small);
+    padding: 5px 10px;
+    /* transform: translateY(-4px); */
 }
 
 /* Temporary styles */
