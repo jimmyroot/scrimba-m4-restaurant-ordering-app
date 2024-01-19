@@ -1,6 +1,3 @@
-// Todo 4: Create a selection function for the bottom row of icons (use vivid color for selection)
-// Todo 5: Create star rating system
-// Todo: Code comments
 // Todo: Remove unused ids and classes
 
 import { menuArray } from './data.js'
@@ -15,18 +12,22 @@ const modalCheckout = document.getElementById('modal-checkout')
 const modalOrderConfirmation = document.getElementById('modal-order-confirmation')
 const modalMyOrders = document.getElementById('modal-my-orders')
 const modalDiscounts = document.getElementById('modal-discounts')
-const formCardDet = document.querySelectorAll('#f-card-det')[0]
+const formCardDet = document.querySelectorAll('#form-card-detail')[0]
 
 // Init vars
 let basket = []
 let orderHistory = []
 let discountMultiplier = 0
+let currentStarRating = 1
+const defaultCategory = 'coffee'
 const discountCodes = {
     'JAN10': 0.9,
     'OFF20': 0.8
 }
 
-// --- EVENT LISTENERS --- // 
+// ----------------------- //
+// --- EVENT LISTENERS --- //
+// ----------------------- //
 
 // Order type btns
 document.getElementById('div-order-type').addEventListener('click', e => {
@@ -34,21 +35,10 @@ document.getElementById('div-order-type').addEventListener('click', e => {
     if (id) handleSelectOrderType(e.target)
 })
 
-// Menu filter btns
-ulMenuFilter.addEventListener('click', e => {
-    const filter = e.target.dataset.filter
-    if (filter) handleFilterSelection(e.target, filter)
-})
-
-// Menu item add btns
-ulMenu.addEventListener('click', e => {
-    const id = e.target.dataset.id
-    if (id) handleAddItemToOrder(id)
-})
-
 // Footer nav
 document.getElementById('ul-footer-nav').addEventListener('click', e => {
     const type = e.target.dataset.type
+    const tag = e.target.tagName
 
     // I use this object literal 'switch' style whenever a modal has more than one button
     const handleClick = {
@@ -58,9 +48,23 @@ document.getElementById('ul-footer-nav').addEventListener('click', e => {
         discounts: () => {
             showModal(modalDiscounts, true)
         }
-    }   
+    }
     if (type) handleClick[type]()
-}) 
+    if (tag === 'BUTTON') handleSelectNav(e.target)
+
+})
+
+// Menu filter btns
+ulMenuFilter.addEventListener('click', e => {
+    const filter = e.target.dataset.filter
+    if (filter) handleSelectFilter(e.target, filter)
+})
+
+// Menu item add btns
+ulMenu.addEventListener('click', e => {
+    const id = e.target.dataset.id
+    if (id) handleAddItemToOrder(id)
+})
 
 // View basket btn (via parent section element, so we can re-render btn whenever we want)
 secBasket.addEventListener('click', e => {
@@ -71,7 +75,17 @@ secBasket.addEventListener('click', e => {
 // Order confirmation modal, just a close btn (resets order system when clicked)
 modalOrderConfirmation.addEventListener('click', e => {
     const type = e.target.dataset.type
-    if (type === 'reset') handleReset()
+    console.log(e.target.dataset.starId)
+
+    const handleClick = {
+        close: () => {
+            showModal(modalOrderConfirmation, false)
+        },
+        star: () => {
+            renderStars(e.target.dataset.starId)
+        }
+    }
+    if (type) handleClick[type]()
 })
 
 // Basket buttons, go to checkout, remove ite, or close
@@ -80,7 +94,8 @@ modalBasket.addEventListener('click', e => {
     
     const handleClick = {
         checkout: () => {
-            handleCheckout()
+            showModal(modalBasket, false)
+            showModal(modalCheckout, true)
         },
         close: () => {
             showModal(modalBasket, false)
@@ -116,13 +131,13 @@ modalCheckout.addEventListener('click', e => {
     if (type) handleClick[type]()
 })
 
-// Discounts modal, just the close btn
+// Discounts modal close btn
 modalDiscounts.addEventListener('click', e => {
     const type = e.target.dataset.type
     if (type === 'close') showModal(modalDiscounts, false)
 })
 
-// My Orders (order history) modal, just a close btn
+// My Orders (order history) modal close btn
 modalMyOrders.addEventListener('click', e => {
     const type = e.target.dataset.type
     if (type === 'close') showModal(modalMyOrders, false)
@@ -130,16 +145,23 @@ modalMyOrders.addEventListener('click', e => {
 
 // Credit card form — every time the value changes, remove warnng if a value exists, else
 // add the warning class
-formCardDet.addEventListener('input', e => {
+formCardDet.addEventListener('input', e => {        
     const input = e.target
     Boolean(input.value) ? input.classList.remove('warning') : input.classList.add('warning')
 })
 
-// Render functions
+// ------------------------ //
+// --- RENDER FUNCTIONS --- // 
+// ------------------------ //
+
+// Render the main menu according to the category we pass in; categories can be found in menuArray
 const renderMenu = (menu, category = 'coffee') => {
+
+    // Filter the menu, chain map to keep things neat
     ulMenu.innerHTML = menu.filter(item => item.category === category).map((item, index, arr) => {
         const {name, ingredients, price, imageURL, id} = item
-        const isLastIter = index + 1 === arr.length
+        // Create a boolean isLastIter to track if we are on the last iteration
+        const isLastIter = ((index + 1) === arr.length)
         return `
             <li class="li-menu-item">
                 <img class="img-item" src="${imageURL}">
@@ -159,12 +181,13 @@ const renderMenu = (menu, category = 'coffee') => {
     }).join('')
 }
 
+// Render basket contents in basket modal, called before we show the basket modal
 const renderBasket = basket => {
 
     // Generate html for items in basket
     const htmlBasket = basket.map((item, index, arr) => {
         const {name, ingredients, price, imageURL, instanceId} = item
-        const isLastIter = index + 1 === arr.length
+        const isLastIter = ((index + 1) === arr.length)
         return `
             <li class="li-menu-item">
                 <img class="img-item" src="${imageURL}">
@@ -183,23 +206,28 @@ const renderBasket = basket => {
         `
     }).join('')
 
-    // Create the html for the basket total. If a discount is active, get the percentage and 
-    // display it next to 'Total'. Else htmlDiscount is an empty string and displays nothing
-    // const htmlDiscount = 
+    // Create the html for the basket total. Use our renderDiscountStatus to show
+    // if the user has used a discount code
     const htmlTotal = `
         <p>Total ${renderDiscountStatus(discountMultiplier)}:</p>
         <p id="p-basket-total">£${getOrderTotal(basket)}</p>
     `
 
-    // Render the basket contents, then the total amount
+    // Render the basket contents and total amount in respective elements
     document.getElementById('ul-basket-items').innerHTML = htmlBasket
     document.getElementById('div-basket-total').innerHTML = htmlTotal
     
-    document.getElementById('div-checkout-total').innerHTML = htmlTotal
+    // Set the checkout button to disabled if the basket is empty, or vice versa
     enableButtons([document.getElementById('btn-checkout')], basket.length > 0)
+    
+    // When the basket is rendered we need to update the button on the main page, so we
+    // may as well do that here
     renderViewBasketBtn(basket)
 }
 
+// Render checkout modal; not much to do here except update the total and show 
+// if a discount is applied. Called when the modal is shown and when a user enters 
+// a discount code, valid or not
 const renderCheckout = basket => {
 
     const htmlCheckoutTotal = `
@@ -209,11 +237,13 @@ const renderCheckout = basket => {
     document.getElementById('div-checkout-total').innerHTML = htmlCheckoutTotal
 }
 
+// Render order confirmation, show a list of the items ordered and if a discount 
+// was applied. Also, show star rating
 const renderOrderConfirmation = basket => {
    
     let html = basket.map(item => {
         return `
-            <div class="d-ordered-item">
+            <div class="div-ordered-item">
                 <p>${item.name}</p><p>£${item.price.toFixed(2)}</p>
             </div>
         `
@@ -222,18 +252,27 @@ const renderOrderConfirmation = basket => {
     html += `
         <li>
             <div class="div-divider div-divider-accent"></div>
-            <div class="d-total" id="div-order-confirmed-total">
+            <div class="div-space-between">
                 <p>Total: ${renderDiscountStatus(discountMultiplier)}</p>
                 <p>£${getOrderTotal(basket)}</p>
             </div>
         </li>
     `
+
     document.getElementById('u-modal-order-complete-details').innerHTML = html
+    renderStars(currentStarRating)
 }
 
+// Render the Order history modal, called just before the 'my-orders' modal is displayed.
+// Similar functionality to the other render loops in the project
 const renderOrderHistory = orderHistory => {
     document.getElementById('ul-order-history').innerHTML = orderHistory.map((order, index, arr) => {
-        const isLastIter = index + 1 === arr.length
+        const isLastIter = ((index + 1) === arr.length)
+        const starRating = []
+        while (starRating.length < order.starRating) {
+            starRating.push(`<i class="bx bxs-star"></i>`)
+        } 
+        
         return `
             <li class="li-order-history">
                 <div class="div-space-between">
@@ -241,15 +280,19 @@ const renderOrderHistory = orderHistory => {
                         <p>£${order.total}</p>
                 </div>
                 <p>${order.items.map(item => item).join(', ')}</p>
+                <p>You thought this order was: ${starRating.map(star => star).join('')}</p>
             </li>
             ${isLastIter ? '' : '<div class="div-divider div-divider-accent"></div>'}
         `
     }).join('')
 }
 
+// Render discounts modal, called just before discounts modal is displayed. Maps through
+// discountCodes object, calculates percentage discount for each multiplier and displays it 
+// in a list
 const renderDiscounts = discountCodes => {
     const html = Object.entries(discountCodes).map((obj, index, arr) => {
-        const isLastIter = index + 1 === arr.length
+        const isLastIter = ((index + 1) === arr.length)
         const percentage = (100-(obj[1] / 1 * 100))
         return `
             <li class="li-discount-code">
@@ -261,6 +304,8 @@ const renderDiscounts = discountCodes => {
     document.getElementById('ul-discounts').innerHTML = html
 }
 
+// Refreshes the View Basket button on the main page according to current basket contents
+// Should be called whenever basket is changed
 const renderViewBasketBtn = basket => {
     secBasket.innerHTML = `
         <button class="btn btn-view-basket" id="btn-view-basket" data-type="basket">
@@ -271,11 +316,18 @@ const renderViewBasketBtn = basket => {
         </button>`
 }
 
-const renderFilterBtns = () => {
+// Renders the menu filter buttons according to the categories in the menuArry. Categories
+// are generated dynamically, so we can easily add more items with new categories to the array 
+// without doing any extra work
+const renderFilterBtns = defaultCategory => {
+    // Use spread along with new Set() to get an array of unique category values from which
+    // we can build the list
     const filterCategories = [...new Set(menuArray.map(item => item.category))]
+    // Render the buttons
     ulMenuFilter.innerHTML = filterCategories.map(category => {
+        // Convert first letter to uppercase for the cateogry text
         const btnTxt = category.charAt(0).toUpperCase() + category.slice(1)
-        const isSelected = category === 'coffee' && 'btn-selected'
+        const isSelected = category === defaultCategory ? 'selected' : ''
         return `
             <li class="li-menu-filter">
                 <button class="btn-filter-category ${isSelected}" data-filter="${category}">${btnTxt}</button>
@@ -284,28 +336,46 @@ const renderFilterBtns = () => {
     }).join('')
 }
 
-// EVENT HANDLERS
-
-// Add item to order; here we are using structuredClone() to create a deep copy of
-// the order item. Now we can give it a UUID without changing the menu array. UUID 
-// means we can add/remove multiple instances of the same item to the order
-
-// This object contains all the logic to be executed when the various buttons across the
-// app are called. This makes the event listeners much more readable.
-const handleClick = {
-    
+// Render the stars 
+const renderStars = numberOfStars => {
+    currentStarRating = numberOfStars
+    let starArr = []
+    for (let star = 1; star <= 5; star++) {
+        star <= currentStarRating ? 
+            starArr.push(`
+                <li class="li-star solid" data-type="star" data-star-id="${star}">
+                    <i class="bx bxs-star"></i>
+                </li>
+            `) : 
+            starArr.push(`
+                <li class="li-star" data-type="star" data-star-id="${star}">
+                    <i class="bx bxs-star" ></i>
+                </li>
+            `)
+    }
+    document.getElementById('ul-star-rating').innerHTML = starArr.map(star => star).join('')
 }
 
+// EVENT HANDLERS
+
+// Add item to order; use structuredClone() to create a deep copy of the selected item and
+// push it to the basket array with a UUID. Now we can add/remove multiple items of the same type
 const handleAddItemToOrder = (id) => {
-    const item = menuArray.find(item => item.id === +id)
-    let deepCopyOfItem = structuredClone(item)
-    deepCopyOfItem.instanceId = uuidv4()
-    basket.push(deepCopyOfItem)
+    // Find the item
+    const itemToAdd = menuArray.find(item => item.id === +id)
+    // Copy it
+    let copyOfItemToAdd = structuredClone(itemToAdd)
+    // Add UUID
+    copyOfItemToAdd.instanceId = uuidv4()
+    basket.push(copyOfItemToAdd)
+    // Update View Basket button
     renderViewBasketBtn(basket)
 }
 
+// Remove item from basket based using it's instanceId
 const handleRemoveItemFromOrder = (instanceIdToRemove) => {
-    // console.log(instanceIdToRemove)
+    // Use reduce to return a new array that doesn't include the item
+    // we're removing
     basket = basket.reduce((arr, item) => {
         if (item.instanceId !== instanceIdToRemove) arr.push(item)
         return arr
@@ -314,54 +384,72 @@ const handleRemoveItemFromOrder = (instanceIdToRemove) => {
     renderBasket(basket)
 }
 
+// Highlight whichever order type the user selected (this is cosmetic only, no real function in this app)
 const handleSelectOrderType = target => {
-    document.querySelectorAll('.btn-order-type.btn-selected').forEach(el => el.classList.remove('btn-selected'))
-    target.classList.add('btn-selected')
+    document.querySelectorAll('.btn-order-type.selected').forEach(el => el.classList.remove('selected'))
+    target.classList.add('selected')
 }
 
-const handleFilterSelection = (el, filter) => {
-    document.querySelectorAll('.btn-filter-category.btn-selected').forEach(el => el.classList.remove('btn-selected'))
-    el.classList.add('btn-selected')
+// Highlight selected footer button. If no target is passed in, nothing gets selected and any existing selections
+// are removed
+const handleSelectNav = target => {
+    const targetAlreadySelected = target ? target.classList.contains('selected') : false
+    document.querySelectorAll('.btn-footer-nav.selected').forEach(btn => btn.classList.remove('selected'))
+    if (target && !targetAlreadySelected) target.classList.add('selected')
+}
+
+// Take care of cosmetics when selecting a filter button, and re-render the menu to show the selected
+// category
+const handleSelectFilter = (el, filter) => {
+    document.querySelectorAll('.btn-filter-category.selected').forEach(el => el.classList.remove('selected'))
+    el.classList.add('selected')
     renderMenu(menuArray, filter)
 }
 
-const handleCheckout = (order) => {
-    showModal(modalBasket, false)
-    showModal(modalCheckout, true)
+const handlePayment = () => {
+    // Reset the card details form, hide checkout modal, show order confirmation modal
+    formCardDet.reset()
+    showModal(modalCheckout, false)
+    showModal(modalOrderConfirmation, true)
 }
 
-const handlePayment = () => {
-    // Save the order details into the orderHistory array
+// Reset the ordering system, clear basket, clear discount codes etc...
+const handleReset = () => {
+    basket = []
+    discountMultiplier = 0
+    currentStarRating = 1
+    renderViewBasketBtn(basket)
+}
+
+// Called before handle reset when user closes the order confirmation modal
+const saveOrder = basket => {
+    // Build an object containing details about the currentorder and push it to the 
+    // orderHistory array
     const orderObj = {
         items: basket.map(item => item.name),
         total: getOrderTotal(basket),
+        starRating: currentStarRating,
         date: new Date().toLocaleDateString('en-GB', {
             month: 'short',
             day: 'numeric',
         })
     }
     orderHistory.push(orderObj)
-
-    // Reset the card details form, hide checkout, show order confirmation
-    formCardDet.reset()
-    showModal(modalCheckout, false)
-    showModal(modalOrderConfirmation, true)
 }
 
-const handleReset = () => {
-    basket = []
-    discountMultiplier = 0
-    showModal(modalOrderConfirmation, false)
-}
-
+// Apply discount if valid
 const handleApplyDiscount = () => {
     const iptDiscount = document.getElementById('ipt-discount')
     const code = iptDiscount.value
+    // Check if the discount code exists 
     if (Object.keys(discountCodes).includes(code)) {
+        // If so set the discountMultiplier
         discountMultiplier = discountCodes[code]
+        // Remove the warning class if it's there
         if (iptDiscount.classList.contains('warning')) iptDiscount.classList.remove('warning')
         renderCheckout(basket)
     } else {
+        // disable discount, show warning; the discount code was invalid
         discountMultiplier = 0
         iptDiscount.classList.add('warning')
         renderCheckout(basket)
@@ -369,7 +457,11 @@ const handleApplyDiscount = () => {
     iptDiscount.value = ''
 }
 
-// Helper functions
+// ------------------------ //
+// --- HELPER FUNCTIONS --- //
+// ------------------------ //
+
+// Calculate order total (with discount, if applied)
 const getOrderTotal = order => {
     if (order.length > 0) {
         let total = order.map(
@@ -384,15 +476,22 @@ const getOrderTotal = order => {
     }
 }
 
+// I guess we would validate the credit card details here in a real app,
+// for now we just check that the fields aren't empty
 const isFormComplete = form => {
+    // Create an array of form elements filtered by value or not 
     const emptyInputs = [...form.elements].filter(element => !Boolean(element.value))
+    // If there are empty elements, add warning class to them and return false
     if (emptyInputs.length > 0) {
         emptyInputs.forEach(input => input.classList.add('warning'))
         return false
     }
+    // If there were no empty inputs return true
     return true
 }
 
+// Used when rendering totals, if discount is applied return a span with a 'discount applied' message,
+// else return an empty string; to be used inside string template
 const renderDiscountStatus = discountMultiplier => {
     if (discountMultiplier > 0) {
         const percentDiscount = getDiscountPercentage(discountMultiplier)
@@ -405,10 +504,13 @@ const renderDiscountStatus = discountMultiplier => {
     return ''
 }
 
-const showModal = (modal, show) => {
-    // Render content to modal before displaying
-
-    const render = {
+// Show or hide the specified modal, and call the respective function assigned
+// to the id of the modal we're displaying; in this way we can execute tasks 
+// before showing the modal dialog
+const showModal = (modal, doShow) => {
+    
+    // These functions will be called before the modal displays
+    const getReadyToShow = {
         'modal-my-orders': () => {
             renderOrderHistory(orderHistory)
         },
@@ -426,22 +528,43 @@ const showModal = (modal, show) => {
         }
     }
     
-    if (show) {
-        render[modal.id]()
+    // These functions will be called when a given modal is closed
+    const cleanUp = {
+        'modal-my-orders': () => {
+            handleSelectNav()
+        },
+        'modal-order-confirmation': () => {
+            saveOrder(basket)
+            handleReset()
+        },
+        'modal-discounts': () => {
+            handleSelectNav()
+        }
+    }
+    
+    // are we showing (doShow = true) or not? 
+    if (doShow) {
+        // If we specified any setup code for the modal, run it now
+        if (Object.keys(getReadyToShow).includes(modal.id)) getReadyToShow[modal.id]()
         modal.showModal()
     } else {
+        // If there's any cleanup code to run, do so
+        if (Object.keys(cleanUp).includes(modal.id)) cleanUp[modal.id]()
         modal.close()
     }
 }
 
+// Takes an array of buttons and a boolean to enable them or not
 const enableButtons = (buttons, doEnable) => {
-    buttons.length > 0 && buttons.forEach(button => button.disabled = !doEnable)
+    if (buttons.length > 0) buttons.forEach(button => button.disabled = !doEnable)
 }
 
+// Get percentage of currently applied discount
 const getDiscountPercentage = discountMultiplier => {
     return (100-(discountMultiplier / 1 * 100))
 }
 
-renderMenu(menuArray, 'coffee')
+// Show the menu
+renderMenu(menuArray, defaultCategory)
 renderViewBasketBtn(basket)
-renderFilterBtns()
+renderFilterBtns(defaultCategory)
